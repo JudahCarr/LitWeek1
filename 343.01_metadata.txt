@@ -1,0 +1,17 @@
+Data citation:
+
+NOAA/CDO, 2024: GHCND Raw Temperature Data via NOAA/National Climatic Data Center, accessed 2024-01-14 from: https://www.ncdc.noaa.gov/cdo-web/. Subsets accessed: 
++ Richmond International Airport, Richmond, VA, USA; 01-March-1939 to 31-December-2023
++ South Bend Airport, South Bend, IN, USA; 01-January-1900 to 31-December-2023
+
+This dataset contains weather variables for:
+-station_id: NOAA code for unique climate station
+-station_location: Longform weather station name
+-prcp: Daily total precipitation in inches
+-tmax: Daily maximum temperature in °F
+-tmin: Daily minimum temperature in °F
+-wind_speed: Speed of fastest 1-second windgust in miles per hour
+-wind_degrees: Direction of fastest 1-second windgust in radial degrees
+-wind_cardinal: Direction of fastest 1-second windgust as major cardinal direction (N,E,S,W)
+
+Focal date range: 1984-01-01 to 1996-06-30.

@@ -1,0 +1,171 @@
+---
+title: "A.01: R Basics"
+author: "Oropendola"
+date: "2024-22-08"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE, message = F)
+```
+
+
+## Setup
+
+Remember that for a Markdown to run, every step of the code must be intact, including reading in data, requiring packages, and assigning data types (such as date columns). Do so in the R-chunk below before moving on to questions 11-15
+
+```{r echo = T, warning = F}
+# read in csv file
+Potato_Chips <- read.csv("data_week_01.csv",
+                         stringsAsFactors = TRUE)
+# require r packages
+require(lubridate)
+require (ggplot2)
+# assign proper date column
+Potato_Chips$Date <- ymd(Potato_Chips$date)
+str(Potato_Chips$Date)
+```
+
+
+_______________
+\newpage
+
+## Question 11: ___ / 5 points
+
+Using R's base plotting package in the R-chunk below, create a histogram that displays the distribution of precipitation, labeling the x-axis with units, and providing a main title. Change the color so the bins are green.
+
+*Preceptor rubric*
+
+ * __ 1 point: correct graph type
+ * __ 1 point: correct data variable
+ * __ 1 point: axis labels
+ * __ 1 point: color/fill formatting
+ * __ 1 point: title
+
+```{r, echo = T, warning = F}
+hist(Potato_Chips$prcp,
+     xlab = "Max Precip (in)",
+     main = "Distribution of Precipitaion",
+     col = "darkseagreen")
+```
+
+_______________
+\newpage
+
+## Question 12: ___ / 5 points
+
+Using ggplot2 in the R-chunk below, create a histogram that displays the distribution of precipitation, labeling the x-axis within units, providing the main title, and changing the fill of the histogram to be "hotpink".
+
+*Preceptor rubric*
+
+ * __ 1 point: correct graph type
+ * __ 1 point: correct data variable
+ * __ 1 point: axis labels
+ * __ 1 point: color/fill formatting
+ * __ 1 point: title
+
+```{r, echo = T, warning = F}
+ggplot(Potato_Chips,
+       aes(x = prcp))+
+  geom_histogram(fill = "hotpink",
+                 color = "black",
+                 alpha = 0.7)+
+  labs(x = "Precipitation (in)",
+       y = "Frequency",
+       title = "Precipitaiton Distribution in VA")
+```
+
+_______________
+\newpage
+
+## Question 13: ___ / 5 points
+
+Using R's base plotting package in the R-chunk below, create a scatterplot with the **maximum temperature** in degrees Fahrenheit on the x-axis and the **wind speed** in MPH on the y-axis. Format the axis labels and main title to have functional names.
+
+*Preceptor rubric*
+
+ * __ 1 point: correct graph type
+ * __ 2 points: correct data placement (x/y)
+ * __ 1 point: axis labels
+ * __ 1 point: title
+
+```{r, echo = T, warning = F}
+plot(x = Potato_Chips$tmax,
+     y = Potato_Chips$wind_speed,
+     xlab = "Max Temp (°F)",
+     ylab = "Wind Speed (MPH)",
+     main = "Correlation Between Maximum Temperature and Wind Speed",
+     pch = 21, 
+     bg = "rosybrown1",
+     col = "black",
+     cex = 1,
+     lwd = 1)
+
+```
+
+_______________
+\newpage
+
+## Question 14: ___ / 5 points
+
+Using ggplot2 in the R-chunk below, create a scatterplot with the maximum temperature in degrees F on the x-axis and the wind speed in MPH on the y-axis. Color the points by weather station location. Format the axis labels (including units) and main title to have a short, functional name. 
+
+*Preceptor rubric*
+
+ * __ 1 point: correct graph type
+ * __ 1 point: correct data variable
+ * __ 1 point: axis labels
+ * __ 1 point: color/fill formatting
+ * __ 1 point: title
+
+```{r, echo = T, warning = F}
+ggplot(Potato_Chips,
+       aes(x = tmax,
+           y = wind_speed,
+           color = station_location))+
+  geom_point(alpha = 0.3,
+             size = 1.1,
+             shape = 20)+
+  labs(x = "Maximum Temperature (°F)",
+       y = "Wind Speed (mph)",
+       title = "Max Temperature vs. Wind Speed",
+       color = "Airport")
+
+```
+
+_______________
+\newpage
+
+# Question 15: ___ / 5 points
+
+For this last, most complicated graph, we want to look at the relationship between maximum temperature, wind speed, wind direction, and site.
+
+In ggplot2, create a two-faceted graph with a scatterplot facet for each weather station location. They should each have the maximum temperature on the x-axis, and wind speed in mph on the y-axis. Points should be colored by the wind's cardinal direction (N/E/S/W). Make sure the graph has a meaningful title, and the axes and color legend have formatted labels.
+
+Because we are not using degrees for direction, this should NOT be plotted on with a polar coordinates.
+
+*Preceptor rubric*
+
+ * __ 1 point: correct graph type
+ * __ 1 point: correct data variables (x/y)
+ * __ 1 points: facet arrangement
+ * __ 1 point: axis labels & title
+ * __ 1 point: legend label & point color
+
+```{r, echo = T, warning = F}
+ggplot(Potato_Chips,
+       aes(x = tmax,
+           y = wind_speed,
+           color = wind_cardinal))+
+  geom_point(alpha = 0.4,
+             size = 1.5,
+             shape = 20)+
+  labs(x = "Maximum Temperature (°F)",
+       y = "Wind Speed (mph)",
+       title = "Correlation Between Maximum Temp & Wind Speed",
+       color = "Cardnial Directions")+
+  facet_grid(rows = vars(station_location))
+
+```

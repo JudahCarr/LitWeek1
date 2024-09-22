@@ -1,0 +1,364 @@
+---
+title: '343.01: Class Markdown Key'
+author: "Oropendola"
+date: "2024-08-20"
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1: RMarkdown and R Code
+
+In an RMarkdown Document, you can write in prose, as you would in any text editor. When you hit the "Knit" button, it will generate an easy-to-read html, pdf, or docx file. We will use these to integrate note-taking, class code, and assignments throughout the semester.
+
+When editing text, we'll start with the basics: *italics* are triggered with one set of asterisks, and **bold** with two sets. For simplicity's sake, we will **not** indent paragraphs, and instead use double line breaks.
+
+When we want to run code in R, we need to start an "R Chunk", we will set them up like the text below. In today's class, we will have `echo = TRUE` or `= T`, so that we can see the code in the html output.
+
+```{r, echo = T}
+# Our first code
+103+577
+```
+
+At its most basic, R is a fancy calculator, capable of performing math quickly and reproducibly. We will often use annotations (which always start with a '#') to help us remember what a bit of code does, or to flag something to come back to later
+
+```{r, echo = T}
+# Do spaces matter?
+103+577
+# multiplication
+77*23
+# division
+99/33
+# parentheses to protect order of operations
+(8-3)*(4+7)
+# exponents
+11^2
+```
+
+R is object-oriented, which means it is structured around data objects that have names, to which we perform functions or from which we make new products, like plots!
+
+An example of a named data object is a vector: a series of values with a name. We can create and ask questions above related vectors. In R, we start with a name and then use "<-" to indicate what is in that name.
+
+```{r, echo = T}
+# high temps from four days
+tmax <- c(78,77,80,83) # c() strings values together
+# low temps from four days
+tmin <- c(62,55,56,59)
+# preview the data in the console by running the name
+tmax 
+tmin
+# check to see if an object is a vector
+is.vector(tmax)
+# create a new vector of temperature changes
+tchange <- tmax - tmin
+# preview the new vector in the console
+tchange
+```
+
+## 2: data.frames, functions, and arguments
+
+Data.frames are a common table structure used in R. Each row is an observation, each column is a variable. Each column should have the same data type: there should only be numeric data in a temperature column, only categorical or factor data in a "species" column, etc.
+
+We will usually create data.frames by assigning a name, and then importing data from csv files using the **function** `read.csv()`. A **function** is a pre-coded program that performs an operation. We specify how that function works by adding **arguments**.
+
+For example, R does not always know to treat text from a csv file as factors. On most operating systems, `read.csv()` will leave text as character or strings, and not sort a column into category levels.
+
+```{r, echo = T}
+# read in the weather data without arguments
+# my.name <- function("filename.csv")
+weather <- read.csv("data_week_01.csv")
+# use the function "summary()" to find out what is in the data.frame
+summary(weather)
+```
+
+You can see that R is smart enough to identify numbers, and summarizes them with ranges and averages. It will notes missing values as `NA` without issue. 
+
+However, it is "blind" to the **character** values in station_id, location, and date. It considers each one as a unique STRING of text.
+
+Let's modify our `read.csv()` function with an **argument** called `stringsAsFactors` to correct this.
+
+```{r, echo = T}
+# start the code the same way
+weather <- read.csv("data_week_01.csv",
+                    stringsAsFactors = TRUE)
+# use the function "summary()" to see if it worked!
+summary(weather)
+```
+
+R now "knows" the names of different factors - like the letter for cardinal directions, or the name of the airport the measurement was taken from.
+
+`summary()` is just one exploratory function. We can also use `str()` to find a more concise vertical summary, or `head()` to see the first few rows.
+
+```{r, echo = T}
+str(weather)
+```
+
+## 3: Navigating data.frames with [,], $, and more functions
+
+The BIGGEST benefit of R is reproducibility: anyone can use the same code on the same data to get the same results, with (usually) no fear of over-writing a dataset or having an invisible formula in a cell, like you do in Excel.
+
+However, it isn't as easy to *see* your data in R, especially for large datasets. As such, we need to be comfortable navigating our data.frames with syntax and functions. While we learn to do this, we will also discover that R is quite picky about cAse sENsitvity and sp3lling.
+
+```{r, echo = T}
+# Open a tab with a (big) preview of the data.frame.
+#View(weather) # this works, but we DON'T want it in the final markdown
+#view(weather) # this does not work - command needs to be capital V
+#View(Weather) # this does not work - data.frame starts with a lowercase w
+```
+
+We will often want to know things about specific columns, rows, or specific cells within a data.frame. If we know the "position" of something within our data.frame, we can use the `name[row#,column#]` to view or extract it.
+
+```{r, echo = T}
+# how many rows?
+nrow(weather)
+# how many columns?
+ncol(weather)
+# the first row of the data.frame
+weather[1,]
+# the first row and the second column
+weather[1,2]
+# The first three rows and the first three columns
+weather[1:3,1:3]
+# The cell from th 80th row and the seventh column
+weather[80,7]
+```
+
+This is useful, but tedious. After all, these are not just floating values -- these are variables! We'll almost always be asking questions about the *columns* of our dataset, which we know have names. 
+
+```{r, echo = T}
+# get a list of column names
+colnames(weather)
+```
+
+To make life easy for us, R will give us a drop-down menu of column names any time we type the data.frame's name followed by a dollar sign - which means we can run mathematical and statistical **functions** on them!
+
+```{r, echo = T}
+# get a summary of the location column
+summary(weather$station_location)
+# find the mean of the maximum temperature
+mean(weather$tmax)
+# find the median of minimum temperature
+median(weather$tmin)
+# find the standard deviation of precipitation
+sd(weather$prcp)
+# find the range of wind speed
+range(weather$wind_speed)
+```
+
+## 4: Basic plots
+
+R comes with a simple plotting package. When we use it, we will usually use `plot()` function to make xy scatterplots or boxplots, and `hist()` for histograms. The syntax among these plots is shared; the arguments specify what data.frame$columns go on which axis, and what the labels and main title should be.
+
+```{r, echo = T}
+# R's base plotting package
+## You can make a lot of graphs by typing plot()
+## plot(x = data.frame$column,
+##      y = data.frame$column,
+##      type = …,
+##      labs = …)
+# A: Ugly scatterplot
+plot(x = weather$tmin,
+     y = weather$tmax)
+## simplified with defaults…
+plot(weather$tmin,
+     weather$tmax)
+# B: Prettier scatterplot:
+plot(x = weather$tmin, #first default is x axis
+     y = weather$tmax, # second default is y axis
+     xlab = "Min Temp (F)", # x axis label
+     ylab = "Max Temp (F)", # y axis label
+     main = "Air Temps at SBI & RVA", # main title of graph
+     col = "blue", #col changes colors
+     pch = 2) #pch chances shape. 2 = triangle, 15 = solid squares
+
+plot(x=weather$tmin,
+     y = weather$tmax,
+     xlab = "Min Temp (F)",
+     ylab = "Max Temp (F)",
+     main = "Air Temps at SBI & RVA",
+     pch = 21, #pch changes shape
+     bg = "lightpink", #bg fill color
+     col = "black", #col is border color
+     cex = 1, #cex is point size
+     lwd = 1) #lwd is width of border
+## simplified with defaults…
+
+```
+
+If one variable is categorical and the other is numeric, R should be smart enough to switch from a scatterplot to a boxplot.
+
+```{r, echo = T}
+## station_id is a categorical
+plot(weather$station_id,
+     y = weather$tmax,
+     xlab = "Station ID",
+     ylab = "Max Temp (F)",
+     main = "Differences in SBI & RVA",
+     col = c("hotpink", "purple")) #c(,) allows you to choose two different colors for each box
+
+```
+
+Sometimes, we just want to know the distribution of a single numeric variable. In these cases, histograms are our best friends! We only input the column of interest on the x-axis, because R will tabulate the frequency or number of observations on the y-axis for us.
+
+```{r, echo = T}
+hist(weather$tmax,
+     xlab = "Max Temp (F)",
+     main = "Distribution of Temps",
+     col = "darkgreen")
+hist(weather$tmin,
+     xlab = "Min Temp (F)",
+     main = "Distribution of Temps",
+     col = "lightgreen")
+```
+
+## 5: Dealing with dates & times
+
+Time data is incredibly annoying...humans write it differently depending on culture and context, leading to all manner of confusion during analysis. Computers prefer for dates to be read in as YYYY-MM-DD, but anyone who has ever opened Excel knows that such formatting goes out the window the instant a file is saved or updated. 
+
+Fortunately, there is a package in R called `lubridate` which specializes in wrangling date information into readable formats, and then extracting relevant parts of time data. To use it, we must first install it, and then require it into the R session.
+
+```{r, echo = T}
+# bring the package in
+require(lubridate)
+```
+
+Okay, here's where object orientation really starts to matter: we need to **overwrite** the original `weather$date` column using the lubridate `ymd()` function to extract date information from the `$date` column.
+
+```{r, echo = T}
+# what is the current data type of weather$date?
+#summary(weather$date)
+# overwrite it as a date using ymd()
+weather$date <- ymd(weather$date)
+# did it work?
+summary(weather$date)
+str(weather$date) #compact summary
+```
+
+We can use `lubridate` to create new columns that hold just a portion of the date column, such as the year or month. This is confusing in its own way, because sometimes the name of the column is the same as the name of the function.
+
+```{r, echo = T}
+# make a year column
+weather$Year <- year(weather$date)
+# make a month column
+weather$Month <- month(weather$date)
+weather$ordDate <- yday(weather$date)
+```
+
+Time data is also annoying because in some cases, we should treat it as numeric, and other times we should treat it as a factor. For example, January is month number 1, February month 2, but they don't make much sense when we consider the graphical relationship between month and minimum temperatures.
+
+```{r, echo = T}
+# plot with month on x, tmin on y
+plot(x = as.factor(weather$Month),# the extra circles in the plot are outliers
+     y = weather$tmin,
+     xlab = "Month",
+     ylab = "Average Minimum Temperature (F)")
+```
+
+In this context, month makes far more sense as an ordinal category. Fortunately, we can use the `as.X()` family of functions to re-assign the data.type on the fly.
+
+```{r, echo = T}
+# summary of month as is
+
+# summary of a factor version of month
+
+# replot with factor version of month
+
+```
+
+## 6: Nice graphs with ggplot2
+
+R's base plots are fine, but professional plots are often made with the R package `ggplot2`. Like lubridate, it needs to be installed and then required for it to work in an R session. 
+
+```{r, echo = T}
+require(ggplot2) #or tidyverse
+```
+
+After that, we have to get familiar with the ggplot syntax…
+
+```{r, echo = T, warning=F}
+# ggplot is the function - not ggplot2
+# ggplots follow a distinct syntax or logic from R's
+## base plotting package:
+###  ggplot(data.frame,
+###        aes(x= column, 
+###            y = column)) +
+###     geometry()…  
+
+## A: Simple ggplot2 scatterplot
+ggplot(weather, #tell R the dataframe
+       aes(x = tmin, #then the x variable
+           y = tmax))+ #then the y variable
+  geom_point()+ #geometries explain the type of plot we want
+  labs(x = "Minimum Temperatures (F)",
+       y = "Maximum Temperatures (F)",
+       title = "Temperature Range in VA & IN") #not main, main is for base R plot
+
+## B: Complicated ggplot2 scatterplot
+ggplot(weather,
+       aes(x = tmin,
+           y = tmax,
+           color = station_id))+
+  geom_point(alpha = 0.1, #alpha is the transparancy of the points
+            size = 0.8)+
+ labs(x = "Minimum Temperatures (F)",
+       y = "Maximum Temperatures (F)",
+       title = "Temperature Range in VA & IN",
+      color = "Airport") #if you use color above, use color below
+
+## C: A simplified complicated plot that
+### splits up the two station_ids into facets
+
+ggplot(weather,
+       aes(x = tmin,
+           y = tmax,
+           color = station_id))+
+  geom_point(shape = 20, #shape is the shape of the points, can change
+             alpha = 0.5, #alpha is the transparency of the points
+             aes(size = prcp))+ #look up ggplot shapes; there
+  facet_grid(row = vars(station_id))+ #col (column) instead of row are better to show to lows and highs better
+  labs(x = "Minimum Temperatures (F)",
+       y = "Maximum Temperatures (F)",
+      title = "Temperature Range in VA & IN",
+      color = "Airport", 
+      size = "Precipitation (in)") #labels the side tittles
+## D: Pretty histogram of wind speeds
+ggplot(weather,
+       aes(x = wind_speed,))+
+  geom_histogram(bins = 30,
+                 fill = "cornflowerblue",#fill is for wide objects
+                 color = "black")+#color is for narrow objects
+  labs(x = "Wind Speed (mph)",
+       y = "Frequency",
+       title = "Wind Speed Frequency")+
+  theme_bw()
+
+ggplot(weather,
+       aes(x = wind_speed,
+           fill = station_id))+ #if using fill by a variable, it must go in the aesthetics
+  geom_histogram(bins = 30,
+                 color = "black",
+                 alpha = 0.7)+#color is for narrow objects
+  labs(x = "Wind Speed (mph)",
+       y = "Frequency",
+       title = "Wind Speed Frequency")+
+  theme_bw()
+```
+
+We can even make some pretty cool graphs, in which we can look at the frequency of wind direction at our two different airports.
+
+```{r, echo = TRUE}
+ggplot(weather,
+      aes(x = wind_degrees,
+          fill = wind_cardinal))+
+  geom_histogram(alpha = 0.7)+
+  coord_polar()+
+  facet_grid(cols = vars(station_id))
+```
+
+#### R resources #####
